@@ -1,3 +1,7 @@
 # Ignore container's data.
 */data/*
 */logs/*
+
+# Ignore ide
+/.idea/
+/.vscode/
