@@ -1,0 +1,62 @@
+version: '2.3'
+
+networks:
+    skywalking-net:
+        ipam:
+            config:
+                - subnet: 192.168.1.0/24
+        external: false
+
+services:
+    skywalking_elasticsearch:
+        image: elasticsearch:7.17.8
+        container_name: skywalking_elasticsearch
+        environment:
+            - discovery.type=single-node
+        volumes:
+            - ./data/elasticsearch:/usr/share/elasticsearch/data
+            - ./logs/elasticsearch:/usr/share/elasticsearch/logs
+        networks:
+            skywalking-net:
+                ipv4_address: 192.168.1.2
+        ports:
+            - 9200:9200
+            - 9300:9300
+    skywalking_oap:
+        image: apache/skywalking-oap-server:8.9.1
+        container_name: skywalking_oap
+        environment:
+            - SW_STORAGE_ES_CLUSTER_NODES=192.168.1.2:9200
+            - SW_STORAGE=elasticsearch
+        restart: on-failure
+        deploy:
+            restart_policy:
+                condition: any
+                delay: 15s
+        volumes:
+            - ./logs/skywalking/oap:/skywalking/logs
+        networks:
+            skywalking-net:
+                ipv4_address: 192.168.1.3
+        ports:
+            - 11800:11800
+            - 12800:12800
+        depends_on:
+            - skywalking_elasticsearch
+    skywalking_ui:
+        image: apache/skywalking-ui:8.9.1
+        container_name: skywalking_ui
+        environment:
+            - SW_OAP_ADDRESS=http://192.168.1.3:12800
+        networks:
+            skywalking-net:
+                ipv4_address: 192.168.1.4
+        ports:
+            - 60000:8080
+        restart: on-failure
+        deploy:
+            restart_policy:
+                condition: any
+                delay: 15s
+        depends_on:
+            - skywalking_oap
