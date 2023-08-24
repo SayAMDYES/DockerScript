@@ -1,21 +1,21 @@
 version: '3'
 
 services:
-    pg-db-1:
-        image: postgres:15.3
-        container_name: postgres-1
-        ports:
-            - 5432:5432
-        environment:
-            - POSTGRES_USER=postgres
-            - POSTGRES_PASSWORD=123456
-            - POSTGRES_DB=postgres
-    pg-db-2:
-        image: postgres:15.3
-        container_name: postgres-2
-        ports:
-            - 5433:5432
-        environment:
-            - POSTGRES_USER=postgres
-            - POSTGRES_PASSWORD=123456
-            - POSTGRES_DB=postgres
+  pg-db-1:
+    image: postgres:15.3
+    container_name: postgres-1
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=123456
+      - POSTGRES_DB=postgres
+  pg-db-2:
+    image: postgres:15.3
+    container_name: postgres-2
+    ports:
+      - 5433:5432
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=123456
+      - POSTGRES_DB=postgres
