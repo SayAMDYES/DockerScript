@@ -1,0 +1,105 @@
+version: '3'
+
+services:
+  kafka_node_1:
+    image: bitnami/kafka:latest
+    container_name: kafka_node_1
+    hostname: kafka-node-1.local
+    volumes:
+      - ./data/kafka/node1:/var/lib/kafka/data
+    environment:
+      KAFKA_CFG_NODE_ID: 0
+      KAFKA_ADVERTISED_LISTENERS: INSIDE://kafka-node-1.local:9093,OUTSIDE://kafka-node-1.local:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
+      KAFKA_LISTENERS: INSIDE://0.0.0.0:9093,OUTSIDE://0.0.0.0:9092
+      KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
+      KAFKA_ZOOKEEPER_CONNECT: loadbalancer.local:2181
+      KAFKA_ZOOKEEPER_PREFIX: /kafka
+    depends_on:
+      - loadbalancer
+      - kafka_zookeeper_cluster_1
+      - kafka_zookeeper_cluster_2
+      - kafka_zookeeper_cluster_3
+  kafka_node_2:
+    image: bitnami/kafka:latest
+    container_name: kafka_node_2
+    hostname: kafka-node-2.local
+    volumes:
+      - ./data/kafka/node2:/var/lib/kafka/data
+    environment:
+      KAFKA_CFG_NODE_ID: 1
+      KAFKA_ADVERTISED_LISTENERS: INSIDE://kafka-node-2.local:9093,OUTSIDE://kafka-node-2.local:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
+      KAFKA_LISTENERS: INSIDE://0.0.0.0:9093,OUTSIDE://0.0.0.0:9092
+      KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
+      KAFKA_ZOOKEEPER_CONNECT: loadbalancer.local:2181
+      KAFKA_ZOOKEEPER_PREFIX: /kafka
+    depends_on:
+      - loadbalancer
+      - kafka_zookeeper_cluster_1
+      - kafka_zookeeper_cluster_2
+      - kafka_zookeeper_cluster_3
+  kafka_node_3:
+    image: bitnami/kafka:latest
+    container_name: kafka_node_3
+    hostname: kafka-node-3.local
+    volumes:
+      - ./data/kafka/node3:/var/lib/kafka/data
+    environment:
+      KAFKA_CFG_NODE_ID: 2
+      KAFKA_ADVERTISED_LISTENERS: INSIDE://kafka-node-3.local:9093,OUTSIDE://kafka-node-3.local:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
+      KAFKA_LISTENERS: INSIDE://0.0.0.0:9093,OUTSIDE://0.0.0.0:9092
+      KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
+      KAFKA_ZOOKEEPER_CONNECT: loadbalancer.local:2181
+      KAFKA_ZOOKEEPER_PREFIX: /kafka
+    depends_on:
+      - kafka_zookeeper_cluster_1
+      - kafka_zookeeper_cluster_2
+      - kafka_zookeeper_cluster_3
+  kafka_ui:
+    image: provectuslabs/kafka-ui:master
+    container_name: kafka_ui
+    environment:
+      DYNAMIC_CONFIG_ENABLED: 'true'
+    volumes:
+      - ./config/kafka-ui/config.yaml:/etc/kafkaui/dynamic_config.yaml
+    ports:
+      - "48080:48080"
+  kafka_zookeeper_cluster_1:
+    image: zookeeper:latest
+    container_name: kafka_zookeeper_cluster_1
+    hostname: zookeeper-node-1.local
+    volumes:
+      - ./config/zookeeper/zoo1:/conf
+      - ./data/zookeeper/zoo1:/data
+    depends_on:
+      - loadbalancer
+  kafka_zookeeper_cluster_2:
+    image: zookeeper:latest
+    container_name: kafka_zookeeper_cluster_2
+    hostname: zookeeper-node-2.local
+    volumes:
+      - ./config/zookeeper/zoo2:/conf
+      - ./data/zookeeper/zoo2:/data
+    depends_on:
+      - loadbalancer
+  kafka_zookeeper_cluster_3:
+    image: zookeeper:latest
+    container_name: kafka_zookeeper_cluster_3
+    hostname: zookeeper-node-3.local
+    volumes:
+      - ./config/zookeeper/zoo3:/conf
+      - ./data/zookeeper/zoo3:/data
+    depends_on:
+      - loadbalancer
+  loadbalancer:
+    image: haproxy:latest
+    hostname: loadbalancer.local
+    container_name: kafka-haproxy
+    volumes:
+      - ./config/haproxy/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg
+    ports:
+      - "2181:2181"
+      - "2182:2182"
+      - "9092:9092"
