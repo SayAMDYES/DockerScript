@@ -6,15 +6,18 @@ services:
     container_name: kafka_node_1
     hostname: kafka-node-1.local
     volumes:
-      - ./data/kafka/node1:/var/lib/kafka/data
+      - ./data/kafka/node1:/bitnami/kafka/data
+      - ./logs/kafka/node1:/var/log/kafka
     environment:
       KAFKA_CFG_NODE_ID: 0
-      KAFKA_ADVERTISED_LISTENERS: INSIDE://kafka-node-1.local:9093,OUTSIDE://kafka-node-1.local:9092
+      KAFKA_DEFAULT_REPLICATION_FACTOR: 3
+      KAFKA_ADVERTISED_LISTENERS: OUTSIDE://host.docker.internal:49091,INSIDE://kafka-node-1.local:9093
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
-      KAFKA_LISTENERS: INSIDE://0.0.0.0:9093,OUTSIDE://0.0.0.0:9092
+      KAFKA_LISTENERS: OUTSIDE://0.0.0.0:49091,INSIDE://0.0.0.0:9093,
       KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
       KAFKA_ZOOKEEPER_CONNECT: loadbalancer.local:2181
-      KAFKA_ZOOKEEPER_PREFIX: /kafka
+    ports:
+      - "49091:49091"
     depends_on:
       - loadbalancer
       - kafka_zookeeper_cluster_1
@@ -25,15 +28,18 @@ services:
     container_name: kafka_node_2
     hostname: kafka-node-2.local
     volumes:
-      - ./data/kafka/node2:/var/lib/kafka/data
+      - ./data/kafka/node2:/bitnami/kafka/data
+      - ./logs/kafka/node2:/var/log/kafka
     environment:
       KAFKA_CFG_NODE_ID: 1
-      KAFKA_ADVERTISED_LISTENERS: INSIDE://kafka-node-2.local:9093,OUTSIDE://kafka-node-2.local:9092
+      KAFKA_DEFAULT_REPLICATION_FACTOR: 3
+      KAFKA_ADVERTISED_LISTENERS: OUTSIDE://host.docker.internal:49092,INSIDE://kafka-node-2.local:9093
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
-      KAFKA_LISTENERS: INSIDE://0.0.0.0:9093,OUTSIDE://0.0.0.0:9092
+      KAFKA_LISTENERS: OUTSIDE://0.0.0.0:49092,INSIDE://0.0.0.0:9093
       KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
       KAFKA_ZOOKEEPER_CONNECT: loadbalancer.local:2181
-      KAFKA_ZOOKEEPER_PREFIX: /kafka
+    ports:
+      - "49092:49092"
     depends_on:
       - loadbalancer
       - kafka_zookeeper_cluster_1
@@ -44,15 +50,18 @@ services:
     container_name: kafka_node_3
     hostname: kafka-node-3.local
     volumes:
-      - ./data/kafka/node3:/var/lib/kafka/data
+      - ./data/kafka/node3:/bitnami/kafka/data
+      - ./logs/kafka/node3:/var/log/kafka
     environment:
       KAFKA_CFG_NODE_ID: 2
-      KAFKA_ADVERTISED_LISTENERS: INSIDE://kafka-node-3.local:9093,OUTSIDE://kafka-node-3.local:9092
+      KAFKA_DEFAULT_REPLICATION_FACTOR: 3
+      KAFKA_ADVERTISED_LISTENERS: OUTSIDE://host.docker.internal:49093,INSIDE://kafka-node-3.local:9093
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
-      KAFKA_LISTENERS: INSIDE://0.0.0.0:9093,OUTSIDE://0.0.0.0:9092
+      KAFKA_LISTENERS: OUTSIDE://0.0.0.0:49093,INSIDE://0.0.0.0:9093
       KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
       KAFKA_ZOOKEEPER_CONNECT: loadbalancer.local:2181
-      KAFKA_ZOOKEEPER_PREFIX: /kafka
+    ports:
+      - "49093:49093"
     depends_on:
       - kafka_zookeeper_cluster_1
       - kafka_zookeeper_cluster_2
@@ -102,4 +111,3 @@ services:
     ports:
       - "2181:2181"
       - "2182:2182"
-      - "9092:9092"

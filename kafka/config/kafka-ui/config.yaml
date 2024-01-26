@@ -2,4 +2,4 @@ server.port: 48080
 kafka:
   clusters:
     - name: local
-      bootstrapServers: kafka-node-1.local:9092,kafka-node-2.local:9092,kafka-node-3.local:9092
+      bootstrapServers: host.docker.internal:49091,host.docker.internal:49092,host.docker.internal:49093
